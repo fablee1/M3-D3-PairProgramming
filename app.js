@@ -1,3 +1,20 @@
+
+fetch("http://www.splashbase.co/api/v1/images/search?query=forest").then(response => response.json())
+.then((data) => {
+    console.log(data);
+    const lastCarousel = document.getElementsByClassName("carousel-inner")[0];
+    for (let i = 0; i < data.length; i++) {
+      const div = document.createElement("div");
+      div.className = "carousel-item";
+      const img = document.createElement("img")
+      img.className = "d-block w-100"
+      img.src = `${data[i].url}`;
+      div.appendChild(img)
+      lastCarousel.appendChild(div);
+      
+    }
+  });
+
 const getData = (searchQuery) => {
     fetch(`http://www.splashbase.co/api/v1/images/search?query=${searchQuery}`)
     .then(response => response.json())
