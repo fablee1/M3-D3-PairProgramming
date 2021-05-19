@@ -1,20 +1,3 @@
-
-fetch("http://www.splashbase.co/api/v1/images/search?query=forest").then(response => response.json())
-.then((data) => {
-    console.log(data);
-    const lastCarousel = document.getElementsByClassName("carousel-inner")[0];
-    for (let i = 0; i < data.length; i++) {
-      const div = document.createElement("div");
-      div.className = "carousel-item";
-      const img = document.createElement("img")
-      img.className = "d-block w-100"
-      img.src = `${data[i].url}`;
-      div.appendChild(img)
-      lastCarousel.appendChild(div);
-      
-    }
-  });
-
 const getData = (searchQuery) => {
     fetch(`http://www.splashbase.co/api/v1/images/search?query=${searchQuery}`)
     .then(response => response.json())
@@ -32,6 +15,7 @@ const showModal = (imgUrl) => {
     const modal = document.createElement('div')
     modal.classList.add('modal')
     modal.setAttribute('tabindex', '-1')
+    modal.id = "exampleModal"
     modal.innerHTML = `
         <div class="modal-dialog">
             <div class="modal-content">
@@ -56,8 +40,10 @@ const showModal = (imgUrl) => {
 }
 
 const createImages = (data) => {
+    console.log(data.map(element => element.url))
+
     let container = document.querySelector('.album > .container')
-    container.childNodes[1].remove()
+    container.childNodes[0].remove()
 
     let row = document.createElement('div')
     row.classList.add('row')
@@ -87,6 +73,8 @@ const createImages = (data) => {
         const view = document.createElement('button')
         view.type = 'button'
         view.classList.add('btn', 'btn-sm', 'btn-outline-secondary')
+        view.setAttribute('data-toggle', 'modal')
+        view.setAttribute('data-target', '#exampleModal')
         view.innerText = 'View'
         view.addEventListener('click', (e) => {
             showModal(e.path[5].childNodes[1].childNodes[1].src)
@@ -118,14 +106,37 @@ window.onload = () => {
     })
 
 
-    const input = document.querySelector('input')
     buttons[1].addEventListener('click', () => {
+        const input = document.querySelector('input')
         const inputValue = input.value
         input.value = ''
+        console.log(inputValue, !inputValue)
         if(!inputValue) {
             getData(randomQueries[Math.floor(Math.random()*randomQueries.length)])
         } else {
             getData(inputValue)
         }
     })
+
+    
+    fetch("http://www.splashbase.co/api/v1/images/search?query=forest")
+    .then(response => response.json())
+    .then((data) => {
+        const dataNew = data.images.filter(img => !(img.url.includes('unsplash')))
+
+        const lastCarousel = document.getElementsByClassName("carousel-inner")[0];
+        for (let i = 0; i < dataNew.length; i++) {
+            const div = document.createElement("div");
+            if(i === 0) {
+                div.className = "carousel-item active";
+            } else {
+                div.className = "carousel-item";
+            }
+            const img = document.createElement("img")
+            img.className = "d-block w-100"
+            img.src = `${dataNew[i].url}`;
+            div.appendChild(img)
+            lastCarousel.appendChild(div);
+        }
+    });
 }
